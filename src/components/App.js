@@ -43,7 +43,25 @@ class App extends Component {
     const networkData = MediaDapp.networks[networkId]
     if(networkData) {
       const mediadapp = new web3.eth.Contract(MediaDapp.abi, networkData.address)
-      console.log(mediadapp)
+      this.setState({ mediadapp })
+      const videosCount = await mediadapp.methods.videoCount().call()
+      this.setState({ videosCount })
+
+      for (var i=videosCount; i>=1; i--) {
+        const video = await mediadapp.methods.videos(i).call()
+        this.setState({
+          videos: [...this.state.videos, video]
+        })
+      }
+
+      const latest = await mediadapp.methods.videos(videosCount).call()
+      this.setState({
+        currentHash: latest.hash,
+        currentTitle: latest.title
+      })
+
+      this.setState({ loading:false })
+
     } else {
       window.alert('MediaDapp is not deployed to the detected network')
     }
