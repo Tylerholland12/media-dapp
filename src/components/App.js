@@ -81,9 +81,17 @@ class App extends Component {
       //If network data doesn't exisits, log error
   }
 
-  //Get video
+  //Get video and prepare file for upload
   captureFile = event => {
+    event.preventDefault()
+    const file = event.target.files[0]
+    const reader = new window.FileReader()
+    reader.readAsArrayBuffer(file)
 
+    reader.onloadend = () => {
+      this.setState({ buffer: Buffer(reader.result) })
+      console.log('buffer', this.state.buffer)
+    }
   }
 
   //Upload video
@@ -122,7 +130,7 @@ class App extends Component {
         { this.state.loading
           ? <div id="loader" className="text-center mt-5"><p>Loading...</p></div>
           : <Main
-              //states&functions
+              captureFile={this.captureFile}
             />
         }
       </div>
